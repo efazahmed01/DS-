@@ -1,0 +1,185 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node 
+{
+    int v;
+    struct Node *left, *right;
+};
+
+struct Qnode 
+{
+    struct Node *data;
+    struct Qnode *next;
+};
+
+void push(struct Qnode **front, struct Node *node) 
+{
+    struct Qnode *newNode = (struct Qnode*)malloc(sizeof(struct Qnode));
+    newNode->data = node;
+    newNode->next = NULL;
+    
+    if(*front == NULL) 
+    {
+        *front = newNode;
+            return;
+    }
+    
+    struct Qnode *temp = *front;
+    while(temp->next != NULL) 
+        temp = temp->next;
+
+    temp->next = newNode;
+}
+
+struct Node* pop(struct Qnode **front) 
+{
+    if(*front == NULL) 
+        return NULL;
+    struct Qnode *temp = *front;
+    struct Node *node = temp->data;
+    *front = (*front)->next;
+    free(temp);
+    return node;
+}
+
+int isEmpty(struct Qnode *front) 
+{
+    return (front == NULL);
+}
+
+void level(struct Node *root) 
+{
+    struct Qnode *q = NULL;
+    push(&q, root);
+    
+    while(!isEmpty(q)) 
+    {
+        struct Node *p = pop(&q);
+        printf("%d ", p->v);
+        
+        if(p->left)
+            push(&q, p->left);
+        if(p->right)
+            push(&q, p->right);
+    }
+}
+
+void update(struct Node *root) 
+{
+    struct Qnode *q = NULL;
+    push(&q, root);
+    
+    while(!isEmpty(q)) 
+    {
+        struct Node *p = pop(&q);
+
+        if(p->v == 60)
+            p->v = 100;
+            
+        if(p->left)
+            push(&q, p->left);
+        if(p->right)
+            push(&q, p->right);
+    }
+}
+
+
+struct Node *create(int v) 
+{
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    newNode->v = v;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+void inOrder(struct Node *node) 
+{
+    if(node == NULL) 
+        return;
+    inOrder(node->left);
+    printf("%d ", node->v);
+    inOrder(node->right);
+}
+
+void preOrder(struct Node *node) 
+{
+    if(node == NULL) 
+        return;
+    printf("%d ", node->v);
+    preOrder(node->left);
+    preOrder(node->right);
+}
+
+void postOrder(struct Node *node) 
+{
+    if(node == NULL) 
+        return;
+    postOrder(node->left);
+    postOrder(node->right);
+    printf("%d ", node->v);
+}
+
+int count(struct Node *root) 
+{
+    if(root == NULL) 
+        return 0;
+    return count(root->left) + count(root->right) + 1;
+}
+
+int leaf_count(struct Node *root) 
+{
+    if(root == NULL) 
+        return 0;
+    if(!root->left && !root->right) 
+        return 1;
+    return leaf_count(root->left) + leaf_count(root->right);
+}
+
+int max(int x, int y) 
+{
+    return x > y ? x : y;
+}
+
+int max_height(struct Node *root) 
+{
+    if(root == NULL) 
+        return 0;
+    return max(max_height(root->left), max_height(root->right)) + 1;
+}
+
+int main() 
+{
+    struct Node *root = create(20);
+    struct Node *b = create(30);
+    struct Node *c = create(40);
+    struct Node *d = create(50);
+    struct Node *e = create(60);
+    struct Node *f = create(70);
+    struct Node *g = create(80);
+
+    root->left = b;
+    root->right = c;
+    b->left = d;
+    b->right = e;
+    c->left = f;
+    c->right = g;
+
+    update(root);
+    printf("Level = ");
+    level(root);
+
+    printf("\nPreorder = ");
+    preOrder(root);
+    printf("\nPostorder = ");
+    postOrder(root);
+    printf("\nInorder = ");
+    inOrder(root);
+
+    printf("\nNode = %d\n", count(root));
+    printf("Leaf Node = %d\n", leaf_count(root));
+    printf("Max height = %d\n", max_height(root));
+
+    return 0;
+}
